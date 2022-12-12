@@ -1,11 +1,11 @@
 package com.github.btbrq.simpleeditorplugin.constants
 
-import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.github.btbrq.simpleeditorplugin.domain.TypedRangeHighlighter
 import com.intellij.openapi.util.Key
 
 class Constants {
     companion object {
-        public val MYDATA: Key<MutableList<RangeHighlighter>> = Key.create("MYDATALIST")
+        public val MYDATA: Key<MutableList<TypedRangeHighlighter>> = Key.create("MYDATALIST")
     }
 
 }
