@@ -75,7 +75,24 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type)) {
             splitAlreadyExistingHighlightion(userData, start, end, markupModel, type)
         }
+//        else {
+//            addHighlighting(markupModel, start, end, textAttributes, userData, editor, type)
+//        }
 
+//        if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type) && type.isOverridable()) {
+            addHighlighting(markupModel, start, end, textAttributes, userData, editor, type)
+//        }
+    }
+
+    private fun addHighlighting(
+        markupModel: MarkupModel,
+        start: Int,
+        end: Int,
+        textAttributes: TextAttributes,
+        userData: MutableList<TypedRangeHighlighter>?,
+        editor: Editor,
+        type: HighlighterType
+    ) {
         val highlighter = markupModel.addRangeHighlighter(
             start,
             end,
@@ -89,12 +106,6 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         } else {
             val userData1 = getUserData(editor)!!
             userData1.add(TypedRangeHighlighter(type, highlighter))
-        }
-
-        val userData1: MutableList<TypedRangeHighlighter> = getUserData(editor)!!
-        userData1.forEach {
-            //nie dziala, listuje tylko z aktualnego contextu
-            println("${it.highlighter.startOffset} - ${it.highlighter.endOffset}")
         }
     }
 
@@ -112,6 +123,7 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
 
                 it.highlighter.dispose()
                 userData!!.remove(it)
+                //todo different type of range
 
                 val before = markupModel.addRangeHighlighter(
                     hStart,
@@ -155,7 +167,24 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         type: HighlighterType
     ) = userData!!.stream()
         .filter { it.highlighter.range != null }
-        .filter { it.highlighter.startOffset <= start && it.highlighter.endOffset >= end }
+        .filter { (start >= it.highlighter.startOffset && end <= it.highlighter.endOffset)
+                || (start <= it.highlighter.startOffset && end >= it.highlighter.endOffset)
+                || (start >= it.highlighter.startOffset && end >= it.highlighter.endOffset && start <= it.highlighter.endOffset)
+                || (start <= it.highlighter.startOffset && end <= it.highlighter.endOffset && end >= it.highlighter.startOffset)
+
+
+//            aaaaaaaa
+//              XXXX
+
+//              aaaa
+//            XXXXXXXX
+
+//              aaaa
+//                XXXX
+
+//              aaaa
+//            XXXX
+        }
         .filter { it.type == type}
         .collect(toList())
 
