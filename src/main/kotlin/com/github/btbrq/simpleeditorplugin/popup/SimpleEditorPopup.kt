@@ -27,16 +27,32 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         dialogPanel.layout = BoxLayout(dialogPanel, BoxLayout.PAGE_AXIS)
         val jButton = JButton("green")
         dialogPanel.add(jButton)
-        jButton.addActionListener({ highlight(editor, JBColor.GREEN) })
+        jButton.addActionListener({ color(editor, JBColor.GREEN) })
 
         val jButtonb = JButton("blue")
         dialogPanel.add(jButtonb)
-        jButtonb.addActionListener({ highlight(editor, JBColor.BLUE) })
+        jButtonb.addActionListener({ color(editor, JBColor.BLUE) })
+
+        val jButtonBackground = JButton("green background")
+        dialogPanel.add(jButtonBackground)
+        jButtonBackground.addActionListener({ background(editor, JBColor.GREEN) })
+
+        val jButtonBackground2 = JButton("blue background")
+        dialogPanel.add(jButtonBackground2)
+        jButtonBackground2.addActionListener({ background(editor, JBColor.BLUE) })
 
 
         val jButton1 = JButton("underline")
         jButton1.addActionListener({ underline(editor) })
         dialogPanel.add(jButton1)
+
+        val jButtonBold = JButton("bold")
+        jButtonBold.addActionListener({ bold(editor) })
+        dialogPanel.add(jButtonBold)
+
+        val jButtonItalic = JButton("italic")
+        jButtonItalic.addActionListener({ italic(editor) })
+        dialogPanel.add(jButtonItalic)
 
         val jButton1hh = JButton("highlighters")
         jButton1hh.addActionListener({
@@ -49,7 +65,7 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         add(dialogPanel)
     }
 
-    fun highlight(editor: Editor, color: JBColor) {
+    fun color(editor: Editor, color: JBColor) {
         doHighlight(
             editor,
             TextAttributes(color, null, null, null, 0),
@@ -57,11 +73,35 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         )
     }
 
+    fun background(editor: Editor, color: JBColor) {
+        doHighlight(
+            editor,
+            TextAttributes(null, color, null, null, 0),
+            HighlighterType.HIGHLIGHT
+        )
+    }
+
     fun underline(editor: Editor) {
         doHighlight(
             editor,
-            TextAttributes(null, null, JBColor.YELLOW, EffectType.LINE_UNDERSCORE, Font.BOLD),
+            TextAttributes(null, null, JBColor.YELLOW, EffectType.LINE_UNDERSCORE, 0),
             HighlighterType.UNDERLINE
+        )
+    }
+
+    fun bold(editor: Editor) {
+        doHighlight(
+            editor,
+            TextAttributes(null, null, null, null, Font.BOLD),
+            HighlighterType.BOLD
+        )
+    }
+
+    fun italic(editor: Editor) {
+        doHighlight(
+            editor,
+            TextAttributes(null, null, null, null, Font.ITALIC),
+            HighlighterType.ITALIC
         )
     }
 
@@ -73,14 +113,14 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
 
         val userData = getUserData(editor)
         if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type)) {
-            splitAlreadyExistingHighlightion(userData, start, end, markupModel, type)
+            splitAlreadyExistingHighlighting(userData, start, end, markupModel, type)
         }
 //        else {
 //            addHighlighting(markupModel, start, end, textAttributes, userData, editor, type)
 //        }
 
 //        if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type) && type.isOverridable()) {
-            addHighlighting(markupModel, start, end, textAttributes, userData, editor, type)
+        addHighlighting(markupModel, start, end, textAttributes, userData, editor, type)
 //        }
     }
 
@@ -109,7 +149,7 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         }
     }
 
-    private fun splitAlreadyExistingHighlightion(
+    private fun splitAlreadyExistingHighlighting(
         userData: MutableList<TypedRangeHighlighter>?,
         start: Int,
         end: Int,
@@ -123,26 +163,58 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
 
                 it.highlighter.dispose()
                 userData!!.remove(it)
-                //todo different type of range
+                println("${start}-${end} highlight: ${hStart}-${hEnd}")
 
-                val before = markupModel.addRangeHighlighter(
-                    hStart,
-                    start,
-                    HighlighterLayer.SELECTION - 1,
-                    (it.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
-                    HighlighterTargetArea.EXACT_RANGE
-                )
+                if (isWithinExistingRange(start, end, hStart, hEnd)) {
+                    println("within")
 
-                val after = markupModel.addRangeHighlighter(
-                    end,
-                    hEnd,
-                    HighlighterLayer.SELECTION - 1,
-                    it.highlighter.forcedTextAttributes!!,
-                    HighlighterTargetArea.EXACT_RANGE
-                )
+                    val before = markupModel.addRangeHighlighter(
+                        hStart,
+                        start,
+                        HighlighterLayer.SELECTION - 1,
+                        (it.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
+                        HighlighterTargetArea.EXACT_RANGE
+                    )
 
-                userData.add(TypedRangeHighlighter(type, before))
-                userData.add(TypedRangeHighlighter(type, after))
+                    val after = markupModel.addRangeHighlighter(
+                        end,
+                        hEnd,
+                        HighlighterLayer.SELECTION - 1,
+                        it.highlighter.forcedTextAttributes!!,
+                        HighlighterTargetArea.EXACT_RANGE
+                    )
+
+                    userData.add(TypedRangeHighlighter(type, before))
+                    userData.add(TypedRangeHighlighter(type, after))
+                } else if (includesEntireExistingRange(start, end, hStart, hEnd)) {
+                    println("includes")
+
+                    //just delete
+                } else if (startsWithinExistingRange(start, end, hStart, hEnd)) {
+                    //   aaaaaa
+                    //      xxxxxx
+                    println("within")
+                    val before = markupModel.addRangeHighlighter(
+                        hStart,
+                        start,
+                        HighlighterLayer.SELECTION - 1,
+                        (it.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
+                        HighlighterTargetArea.EXACT_RANGE
+                    )
+                    userData.add(TypedRangeHighlighter(type, before))
+                } else if (startsBeforeExistingRange(start, end, hStart, hEnd)) {
+                    //   aaaaaa
+                    // xxxxxx
+                    println("after")
+                    val after = markupModel.addRangeHighlighter(
+                        end,
+                        hEnd,
+                        HighlighterLayer.SELECTION - 1,
+                        (it.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
+                        HighlighterTargetArea.EXACT_RANGE
+                    )
+                    userData.add(TypedRangeHighlighter(type, after))
+                }
             }
     }
 
@@ -166,11 +238,13 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         end: Int,
         type: HighlighterType
     ) = userData!!.stream()
+        .filter { it.type == type }
         .filter { it.highlighter.range != null }
-        .filter { (start >= it.highlighter.startOffset && end <= it.highlighter.endOffset)
-                || (start <= it.highlighter.startOffset && end >= it.highlighter.endOffset)
-                || (start >= it.highlighter.startOffset && end >= it.highlighter.endOffset && start <= it.highlighter.endOffset)
-                || (start <= it.highlighter.startOffset && end <= it.highlighter.endOffset && end >= it.highlighter.startOffset)
+        .filter {
+            isWithinExistingRange(start, end, it.highlighter.startOffset, it.highlighter.endOffset)
+                    || includesEntireExistingRange(start, end, it.highlighter.startOffset, it.highlighter.endOffset)
+                    || startsWithinExistingRange(start, end, it.highlighter.startOffset, it.highlighter.endOffset)
+                    || startsBeforeExistingRange(start, end, it.highlighter.startOffset, it.highlighter.endOffset)
 
 
 //            aaaaaaaa
@@ -185,8 +259,35 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
 //              aaaa
 //            XXXX
         }
-        .filter { it.type == type}
         .collect(toList())
+
+    private fun startsBeforeExistingRange(
+        start: Int,
+        end: Int,
+        existingStart: Int,
+        existingEnd: Int
+    ) = (start <= existingStart && end <= existingEnd && end >= existingStart)
+
+    private fun startsWithinExistingRange(
+        start: Int,
+        end: Int,
+        existingStart: Int,
+        existingEnd: Int
+    ) = (start >= existingStart && end >= existingEnd && start <= existingEnd)
+
+    private fun includesEntireExistingRange(
+        start: Int,
+        end: Int,
+        existingStart: Int,
+        existingEnd: Int
+    ) = (start <= existingStart && end >= existingEnd)
+
+    private fun isWithinExistingRange(
+        start: Int,
+        end: Int,
+        existingStart: Int,
+        existingEnd: Int
+    ) = start >= existingStart && end <= existingEnd
 
     private fun getUserData(editor: Editor) = editor.getUserData(Constants.MYDATA)
 }
