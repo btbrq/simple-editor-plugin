@@ -114,14 +114,13 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         val userData = getUserData(editor)
         if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type)) {
             splitAlreadyExistingHighlighting(userData, start, end, markupModel, type)
-        }
-//        else {
-//            addHighlighting(markupModel, start, end, textAttributes, userData, editor, type)
-//        }
 
-//        if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type) && type.isOverridable()) {
-        addHighlighting(markupModel, start, end, textAttributes, userData, editor, type)
-//        }
+            if (type.isOverridable()) {
+                addHighlighting(markupModel, start, end, textAttributes, userData, editor, type)
+            }
+        } else {
+            addHighlighting(markupModel, start, end, textAttributes, userData, editor, type)
+        }
     }
 
     private fun addHighlighting(
@@ -156,7 +155,7 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         markupModel: MarkupModel,
         type: HighlighterType
     ) {
-        findHighlighersInRange(userData, start, end, type)
+        findHighlightersInRange(userData, start, end, type)
             .forEach {
                 val hStart = it.highlighter.startOffset
                 val hEnd = it.highlighter.endOffset
@@ -191,8 +190,6 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
 
                     //just delete
                 } else if (startsWithinExistingRange(start, end, hStart, hEnd)) {
-                    //   aaaaaa
-                    //      xxxxxx
                     println("within")
                     val before = markupModel.addRangeHighlighter(
                         hStart,
@@ -203,8 +200,6 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
                     )
                     userData.add(TypedRangeHighlighter(type, before))
                 } else if (startsBeforeExistingRange(start, end, hStart, hEnd)) {
-                    //   aaaaaa
-                    // xxxxxx
                     println("after")
                     val after = markupModel.addRangeHighlighter(
                         end,
@@ -229,10 +224,10 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
             return false
         }
 
-        return findHighlighersInRange(userData, start, end, type).isNotEmpty()
+        return findHighlightersInRange(userData, start, end, type).isNotEmpty()
     }
 
-    private fun findHighlighersInRange(
+    private fun findHighlightersInRange(
         userData: MutableList<TypedRangeHighlighter>?,
         start: Int,
         end: Int,
@@ -245,19 +240,6 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
                     || includesEntireExistingRange(start, end, it.highlighter.startOffset, it.highlighter.endOffset)
                     || startsWithinExistingRange(start, end, it.highlighter.startOffset, it.highlighter.endOffset)
                     || startsBeforeExistingRange(start, end, it.highlighter.startOffset, it.highlighter.endOffset)
-
-
-//            aaaaaaaa
-//              XXXX
-
-//              aaaa
-//            XXXXXXXX
-
-//              aaaa
-//                XXXX
-
-//              aaaa
-//            XXXX
         }
         .collect(toList())
 
