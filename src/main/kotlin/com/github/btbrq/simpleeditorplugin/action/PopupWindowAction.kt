@@ -15,7 +15,7 @@ class PopupWindowAction : AnAction() {
 
         JBPopupFactory.getInstance().createComponentPopupBuilder(SimpleEditorPopup(editor), null)
             .createPopup()
-            .showInFocusCenter()
+            .showInBestPositionFor(editor)
     }
 
 }

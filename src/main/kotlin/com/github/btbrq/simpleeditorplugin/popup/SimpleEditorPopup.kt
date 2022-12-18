@@ -1,8 +1,9 @@
 package com.github.btbrq.simpleeditorplugin.popup
 
+import com.github.btbrq.simpleeditorplugin.domain.HighlighterType
 import com.github.btbrq.simpleeditorplugin.styling.Styler
 import com.intellij.openapi.editor.Editor
-import com.intellij.ui.JBColor
+import com.intellij.openapi.ui.popup.JBPopupFactory
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JPanel
@@ -17,34 +18,26 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         }
 
         val dialogPanel = JPanel()
-        dialogPanel.layout = BoxLayout(dialogPanel, BoxLayout.PAGE_AXIS)
-        val jButton = JButton("green")
-        dialogPanel.add(jButton)
-        jButton.addActionListener({ styler.color(JBColor.GREEN) })
+        dialogPanel.layout = BoxLayout(dialogPanel, BoxLayout.LINE_AXIS)
 
-        val jButtonb = JButton("blue")
-        dialogPanel.add(jButtonb)
-        jButtonb.addActionListener({ styler.color(JBColor.BLUE) })
+        val jButtonColor = JButton("A")
+        dialogPanel.add(jButtonColor)
+        jButtonColor.addActionListener {
+            JBPopupFactory.getInstance().createComponentPopupBuilder(ColorsPopup(editor, HighlighterType.COLOR), null)
+                .createPopup()
+                .showUnderneathOf(this)
+        }
 
-        val jButtonBackground = JButton("green background")
-        dialogPanel.add(jButtonBackground)
-        jButtonBackground.addActionListener({ styler.background(JBColor.GREEN) })
-
-        val jButtonBackground2 = JButton("blue background")
-        dialogPanel.add(jButtonBackground2)
-        jButtonBackground2.addActionListener({ styler.background(JBColor.BLUE) })
-
-
-        val jButton1 = JButton("underline")
-        jButton1.addActionListener({ styler.underline() })
+        val jButton1 = JButton("U")
+        jButton1.addActionListener { styler.underline() }
         dialogPanel.add(jButton1)
 
-        val jButtonBold = JButton("bold")
-        jButtonBold.addActionListener({ styler.bold() })
+        val jButtonBold = JButton("B")
+        jButtonBold.addActionListener { styler.bold() }
         dialogPanel.add(jButtonBold)
 
-        val jButtonItalic = JButton("italic")
-        jButtonItalic.addActionListener({ styler.italic() })
+        val jButtonItalic = JButton("I")
+        jButtonItalic.addActionListener { styler.italic() }
         dialogPanel.add(jButtonItalic)
 
         add(dialogPanel)
