@@ -28,6 +28,14 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
                 .showUnderneathOf(this)
         }
 
+        val jButtonBackground = JButton("H")
+        dialogPanel.add(jButtonBackground)
+        jButtonBackground.addActionListener {
+            JBPopupFactory.getInstance().createComponentPopupBuilder(ColorsPopup(editor, HighlighterType.HIGHLIGHT), null)
+                .createPopup()
+                .showUnderneathOf(this)
+        }
+
         val jButton1 = JButton("U")
         jButton1.addActionListener { styler.underline() }
         dialogPanel.add(jButton1)
