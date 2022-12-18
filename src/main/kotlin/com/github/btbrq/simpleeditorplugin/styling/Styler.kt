@@ -48,6 +48,18 @@ class Styler(var editor: Editor) {
         )
     }
 
+    fun clear(type: HighlighterType) {
+        val primaryCaret: Caret = editor.caretModel.primaryCaret
+        val start: Int = primaryCaret.selectionStart
+        val end: Int = primaryCaret.selectionEnd
+        val markupModel = editor.markupModel
+
+        val userData = getUserData()
+        if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type)) {
+            splitAlreadyExistingHighlighting(userData, start, end, markupModel, type)
+        }
+    }
+
     private fun doHighlight(textAttributes: TextAttributes, type: HighlighterType) {
         val primaryCaret: Caret = editor.caretModel.primaryCaret
         val start: Int = primaryCaret.selectionStart

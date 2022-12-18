@@ -14,11 +14,14 @@ class ColorsPopup(editor: Editor, highlighterType: HighlighterType): JPanel() {
         layout = BoxLayout(this, BoxLayout.LINE_AXIS)
         val styler = Styler(editor)
         val function = actionFunction(highlighterType, styler)
+        val clearAction = Consumer { type: HighlighterType? -> styler.clear(type!!) }
+
         add(ColorIcon(BLUE, function))
         add(ColorIcon(GREEN, function))
         add(ColorIcon(YELLOW, function))
         add(ColorIcon(RED, function))
         add(ColorIcon(PINK, function))
+        add(ClearIcon(BLACK, highlighterType, clearAction))
     }
 
     private fun actionFunction(highlighterType: HighlighterType, styler: Styler): Consumer<JBColor?> {
