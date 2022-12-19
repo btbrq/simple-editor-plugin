@@ -21,21 +21,26 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
             selectionModel.selectWordAtCaret(false)
         }
 
-        val colorButton = PopupIconButton(AllIcons.FileTypes.Text)
+        val colorButton = PopupIconButton(AllIcons.FileTypes.Text, "Text color")
         colorButton.addActionListener(popupAction(editor, HighlighterType.COLOR, colorButton))
         add(colorButton)
 
-        val backgroundButton = PopupIconButton(AllIcons.Actions.Highlighting)
+        val backgroundButton = PopupIconButton(AllIcons.Actions.Highlighting, "Highlight")
         backgroundButton.addActionListener(popupAction(editor, HighlighterType.HIGHLIGHT, colorButton))
         add(backgroundButton)
 
-        val underlineButton = PopupTextButton("U", underlineFont(backgroundButton.font)) { styler.underline() }
+        val underlineButton = PopupTextButton(
+            "U",
+            underlineFont(backgroundButton.font),
+            { styler.underline() },
+            "Underline"
+        )
         add(underlineButton)
 
-        val boldButton = PopupTextButton("B", boldFont(backgroundButton.font)) { styler.bold() }
+        val boldButton = PopupTextButton("B", boldFont(backgroundButton.font), { styler.bold() }, "Bold")
         add(boldButton)
 
-        val italicButton = PopupTextButton("I", italicFont(backgroundButton.font)) { styler.italic() }
+        val italicButton = PopupTextButton("I", italicFont(backgroundButton.font), { styler.italic() }, "Italic")
         add(italicButton)
     }
 

@@ -4,12 +4,13 @@ import com.github.btbrq.simpleeditorplugin.constants.Constants.Companion.BUTTON_
 import java.awt.Font
 import javax.swing.JButton
 
-class PopupTextButton(text: String, font: Font, action: () -> Unit) : JButton(text) {
+class PopupTextButton(text: String, font: Font, action: () -> Unit, tooltipText: String) : JButton(text) {
     init {
+        this.font = font
+        this.toolTipText = tooltipText
         minimumSize = BUTTON_SIZE
         maximumSize = BUTTON_SIZE
         preferredSize = BUTTON_SIZE
-        this.font = font
         addActionListener { action.invoke() }
     }
 }

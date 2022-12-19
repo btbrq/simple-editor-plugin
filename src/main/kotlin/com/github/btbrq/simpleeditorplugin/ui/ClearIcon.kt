@@ -9,6 +9,7 @@ import javax.swing.JButton
 class ClearIcon (icon: Icon, type: HighlighterType, action: Consumer<HighlighterType>): JButton(icon) {
     init {
         addActionListener { action.consume(type) }
+        toolTipText = "Clear"
         minimumSize = COLOR_SIZE
         maximumSize = COLOR_SIZE
         preferredSize = COLOR_SIZE
