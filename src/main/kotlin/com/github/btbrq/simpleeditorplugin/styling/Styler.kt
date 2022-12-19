@@ -6,21 +6,24 @@ import com.github.btbrq.simpleeditorplugin.domain.TypedRangeHighlighter
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.RangeHighlighterEx
-import com.intellij.openapi.editor.markup.*
+import com.intellij.openapi.editor.markup.EffectType
+import com.intellij.openapi.editor.markup.HighlighterTargetArea
+import com.intellij.openapi.editor.markup.MarkupModel
+import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.refactoring.suggested.range
-import com.intellij.ui.JBColor
+import java.awt.Color
 import java.awt.Font
 import java.util.stream.Collectors
 
-class Styler(var editor: Editor) {
-    fun color(color: JBColor) {
+class Styler(private var editor: Editor) {
+    fun color(color: Color) {
         doHighlight(
             TextAttributes(color, null, null, null, 0),
             HighlighterType.COLOR
         )
     }
 
-    fun background(color: JBColor) {
+    fun background(color: Color) {
         doHighlight(
             TextAttributes(null, color, null, null, 0),
             HighlighterType.HIGHLIGHT
@@ -29,7 +32,7 @@ class Styler(var editor: Editor) {
 
     fun underline() {
         doHighlight(
-            TextAttributes(null, null, JBColor.YELLOW, EffectType.LINE_UNDERSCORE, 0),
+            TextAttributes(null, null, Color.YELLOW, EffectType.LINE_UNDERSCORE, 0),
             HighlighterType.UNDERLINE
         )
     }

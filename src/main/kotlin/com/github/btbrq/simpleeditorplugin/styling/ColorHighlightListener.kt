@@ -1,11 +1,11 @@
 package com.github.btbrq.simpleeditorplugin.styling
 
-import com.intellij.ui.JBColor
 import com.intellij.util.Consumer
+import java.awt.Color
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 
-class ColorHighlightListener(private val color: JBColor, private val action: Consumer<JBColor?>) : MouseListener {
+class ColorHighlightListener(private val color: Color, private val action: Consumer<Color>) : MouseListener {
     override fun mouseClicked(e: MouseEvent) {
         action.consume(color)
     }

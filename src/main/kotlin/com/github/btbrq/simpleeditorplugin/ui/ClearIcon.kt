@@ -1,18 +1,16 @@
 package com.github.btbrq.simpleeditorplugin.ui
 
+import com.github.btbrq.simpleeditorplugin.constants.Constants.Companion.COLOR_SIZE
 import com.github.btbrq.simpleeditorplugin.domain.HighlighterType
-import com.github.btbrq.simpleeditorplugin.styling.ClearListener
-import com.intellij.ui.JBColor
 import com.intellij.util.Consumer
-import java.awt.Dimension
-import javax.swing.JPanel
+import javax.swing.Icon
+import javax.swing.JButton
 
-class ClearIcon (color: JBColor, type: HighlighterType, action: Consumer<HighlighterType?>): JPanel() {
+class ClearIcon (icon: Icon, type: HighlighterType, action: Consumer<HighlighterType>): JButton(icon) {
     init {
-        background = color
-        addMouseListener(ClearListener(type, action))
-        minimumSize = Dimension(20, 20)
-        maximumSize = Dimension(20, 20)
-        preferredSize = Dimension(20, 20)
+        addActionListener { action.consume(type) }
+        minimumSize = COLOR_SIZE
+        maximumSize = COLOR_SIZE
+        preferredSize = COLOR_SIZE
     }
 }

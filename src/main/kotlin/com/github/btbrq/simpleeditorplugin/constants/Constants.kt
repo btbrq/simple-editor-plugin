@@ -11,7 +11,8 @@ class Constants {
     companion object {
         val STYLES: Key<MutableList<TypedRangeHighlighter>> = Key.create("SIMPLE_EDITOR_STYLES")
         val BUTTON_SIZE: Dimension = Dimension(30, 30)
-        const val HIGHLIGHTER_LAYER: Int = HighlighterLayer.SELECTION
+        val COLOR_SIZE: Dimension = Dimension(20, 20)
+        const val HIGHLIGHTER_LAYER: Int = HighlighterLayer.SELECTION - 1
         const val FONT_SIZE: Int = 18
     }
 
