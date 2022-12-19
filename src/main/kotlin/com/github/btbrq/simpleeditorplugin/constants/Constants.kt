@@ -1,11 +1,13 @@
 package com.github.btbrq.simpleeditorplugin.constants
 
 import com.github.btbrq.simpleeditorplugin.domain.TypedRangeHighlighter
+import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.util.Key
 
 class Constants {
     companion object {
-        public val MYDATA: Key<MutableList<TypedRangeHighlighter>> = Key.create("MYDATALIST")
+        val STYLES: Key<MutableList<TypedRangeHighlighter>> = Key.create("SIMPLE_EDITOR_STYLES")
+        const val HIGHLIGHTER_LAYER: Int = HighlighterLayer.SELECTION
     }
 
 }

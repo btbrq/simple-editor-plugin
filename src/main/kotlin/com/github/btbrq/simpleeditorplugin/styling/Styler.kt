@@ -89,13 +89,13 @@ class Styler(var editor: Editor) {
         val highlighter = markupModel.addRangeHighlighter(
             start,
             end,
-            HighlighterLayer.SELECTION - 1,
+            Constants.HIGHLIGHTER_LAYER,
             textAttributes,
             HighlighterTargetArea.EXACT_RANGE
         )
 
         if (userData == null) {
-            editor.putUserData(Constants.MYDATA, mutableListOf(TypedRangeHighlighter(type, highlighter)))
+            editor.putUserData(Constants.STYLES, mutableListOf(TypedRangeHighlighter(type, highlighter)))
         } else {
             val userData1 = getUserData()!!
             userData1.add(TypedRangeHighlighter(type, highlighter))
@@ -124,7 +124,7 @@ class Styler(var editor: Editor) {
                     val before = markupModel.addRangeHighlighter(
                         hStart,
                         start,
-                        HighlighterLayer.SELECTION - 1,
+                        Constants.HIGHLIGHTER_LAYER,
                         (it.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
                         HighlighterTargetArea.EXACT_RANGE
                     )
@@ -132,7 +132,7 @@ class Styler(var editor: Editor) {
                     val after = markupModel.addRangeHighlighter(
                         end,
                         hEnd,
-                        HighlighterLayer.SELECTION - 1,
+                        Constants.HIGHLIGHTER_LAYER,
                         it.highlighter.forcedTextAttributes!!,
                         HighlighterTargetArea.EXACT_RANGE
                     )
@@ -148,7 +148,7 @@ class Styler(var editor: Editor) {
                     val before = markupModel.addRangeHighlighter(
                         hStart,
                         start,
-                        HighlighterLayer.SELECTION - 1,
+                        Constants.HIGHLIGHTER_LAYER,
                         (it.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
                         HighlighterTargetArea.EXACT_RANGE
                     )
@@ -158,7 +158,7 @@ class Styler(var editor: Editor) {
                     val after = markupModel.addRangeHighlighter(
                         end,
                         hEnd,
-                        HighlighterLayer.SELECTION - 1,
+                        Constants.HIGHLIGHTER_LAYER,
                         (it.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
                         HighlighterTargetArea.EXACT_RANGE
                     )
@@ -225,5 +225,5 @@ class Styler(var editor: Editor) {
         existingEnd: Int
     ) = start >= existingStart && end <= existingEnd
 
-    private fun getUserData() = editor.getUserData(Constants.MYDATA)
+    private fun getUserData() = editor.getUserData(Constants.STYLES)
 }
