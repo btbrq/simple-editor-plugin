@@ -1,4 +1,4 @@
-package com.github.btbrq.simpleeditorplugin.popup
+package com.github.btbrq.simpleeditorplugin.ui
 
 import com.github.btbrq.simpleeditorplugin.domain.HighlighterType
 import com.github.btbrq.simpleeditorplugin.styling.Styler

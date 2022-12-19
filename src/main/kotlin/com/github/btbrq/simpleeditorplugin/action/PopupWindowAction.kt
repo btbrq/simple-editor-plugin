@@ -1,6 +1,6 @@
 package com.github.btbrq.simpleeditorplugin.action
 
-import com.github.btbrq.simpleeditorplugin.popup.SimpleEditorPopup
+import com.github.btbrq.simpleeditorplugin.ui.SimpleEditorPopup
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys

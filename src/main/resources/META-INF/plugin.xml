@@ -1,29 +1,19 @@
 <idea-plugin>
     <id>com.github.btbrq.simpleeditorplugin</id>
-    <name>IntelliJ Platform Plugin simple-editor-plugin</name>
-    <vendor>btbrq</vendor>
+    <name>Simple Editor</name>
+    <vendor>Bartosz Turek</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
-<!--    <extensions defaultExtensionNs="com.intellij">-->
-<!--        <applicationService serviceImplementation="com.github.btbrq.simpleeditorplugin.services.MyApplicationService"/>-->
-<!--        <projectService serviceImplementation="com.github.btbrq.simpleeditorplugin.services.MyProjectService"/>-->
-<!--    </extensions>-->
-
-<!--    <applicationListeners>-->
-<!--        <listener class="com.github.btbrq.simpleeditorplugin.listeners.MyProjectManagerListener"-->
-<!--                  topic="com.intellij.openapi.project.ProjectManagerListener"/>-->
-<!--    </applicationListeners>-->
-
     <actions>
         <action
-                id="EditorBasics.EditorHandlerIllustration"
+                id="com.github.btbrq.simpleeditorplugin.SimpleEditor"
                 class="com.github.btbrq.simpleeditorplugin.action.PopupWindowAction"
-                text="Editor Add Caret"
-                description="Adds a second caret below the existing one.">
+                text="Simple Editor"
+                description="Styles the selected text.">
 <!--                icon="SdkIcons.Sdk_default_icon">-->
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift M"/>-->
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift E"/>-->
         </action>
 
 
