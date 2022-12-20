@@ -15,11 +15,7 @@ import javax.swing.JPanel
 class SimpleEditorPopup(editor: Editor) : JPanel() {
 
     init {
-        val selectionModel = editor.selectionModel
         val styler = Styler(editor)
-        if (!selectionModel.hasSelection()) {
-            selectionModel.selectWordAtCaret(false)
-        }
 
         val colorButton = PopupIconButton(AllIcons.FileTypes.Text, "Text color")
         colorButton.addActionListener(popupAction(editor, HighlighterType.COLOR, colorButton))
@@ -42,6 +38,9 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
 
         val italicButton = PopupTextButton("I", italicFont(backgroundButton.font), { styler.italic() }, "Italic")
         add(italicButton)
+
+        val clearAllButton = ClearAllIcon { styler.clearAll() }
+        add(clearAllButton)
     }
 
     private fun popupAction(

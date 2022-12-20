@@ -2,7 +2,6 @@ package com.github.btbrq.simpleeditorplugin.ui
 
 import com.github.btbrq.simpleeditorplugin.domain.HighlighterType
 import com.github.btbrq.simpleeditorplugin.styling.Styler
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.editor.Editor
 import com.intellij.ui.DarculaColors
 import com.intellij.util.Consumer
@@ -37,7 +36,7 @@ class ColorsPopup(editor: Editor, highlighterType: HighlighterType) : JPanel() {
         add(ColorIcon(CYAN, function))
         add(ColorIcon(Color(0, 137, 137), function))
 
-        add(ClearIcon(AllIcons.Actions.DeleteTag, highlighterType, clearAction))
+        add(ClearIcon(highlighterType, clearAction))
     }
 
     private fun actionFunction(highlighterType: HighlighterType, styler: Styler): Consumer<Color> {

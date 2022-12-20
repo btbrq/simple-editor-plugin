@@ -51,6 +51,14 @@ class Styler(private var editor: Editor) {
         )
     }
 
+    fun clearAll() {
+        val userData = getUserData()
+        userData?.forEach {
+            it.highlighter.dispose()
+        }
+        userData?.clear()
+    }
+
     fun clear(type: HighlighterType) {
         val primaryCaret: Caret = editor.caretModel.primaryCaret
         val start: Int = primaryCaret.selectionStart
@@ -119,11 +127,8 @@ class Styler(private var editor: Editor) {
 
                 it.highlighter.dispose()
                 userData!!.remove(it)
-                println("${start}-${end} highlight: ${hStart}-${hEnd}")
 
                 if (isWithinExistingRange(start, end, hStart, hEnd)) {
-                    println("within")
-
                     val before = markupModel.addRangeHighlighter(
                         hStart,
                         start,
@@ -142,12 +147,7 @@ class Styler(private var editor: Editor) {
 
                     userData.add(TypedRangeHighlighter(type, before))
                     userData.add(TypedRangeHighlighter(type, after))
-                } else if (includesEntireExistingRange(start, end, hStart, hEnd)) {
-                    println("includes")
-
-                    //just delete
-                } else if (startsWithinExistingRange(start, end, hStart, hEnd)) {
-                    println("within")
+                }  else if (startsWithinExistingRange(start, end, hStart, hEnd)) {
                     val before = markupModel.addRangeHighlighter(
                         hStart,
                         start,
@@ -157,7 +157,6 @@ class Styler(private var editor: Editor) {
                     )
                     userData.add(TypedRangeHighlighter(type, before))
                 } else if (startsBeforeExistingRange(start, end, hStart, hEnd)) {
-                    println("after")
                     val after = markupModel.addRangeHighlighter(
                         end,
                         hEnd,
