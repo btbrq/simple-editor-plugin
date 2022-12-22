@@ -140,13 +140,28 @@ class Styler(private var editor: Editor) {
                 it.highlighter.dispose()
                 userData!!.remove(it)
 
-                if (isWithinExistingRange(start, end, existingStart -1, existingEnd +1) && !isExactRange(start, existingStart, end, existingEnd)) {
+                println("Current: $start - $end, existing: $existingStart - $existingEnd")
+                if (isWithinExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd)) {
+                    println("within existing range")
                     addHighlighter(markupModel, existingStart, start, it, userData, type)
                     addHighlighter(markupModel, end, existingEnd, it, userData, type)
-                }  else if (startsWithinExistingRange(start, end, existingStart -1, existingEnd +1) && !isExactRange(start, existingStart, end, existingEnd)) {
-                    addHighlighter(markupModel, existingStart, start, it, userData, type)
-                } else if (startsBeforeExistingRange(start, end, existingStart -1, existingEnd +1) && !isExactRange(start, existingStart, end, existingEnd)) {
-                    addHighlighter(markupModel, end, existingEnd, it, userData, type)
+                } else if (includesEntireExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd) && !type.isOverridable()) {
+                    println("includes entire range")
+                    addHighlighter(markupModel, start, end, it, userData, type)
+                }  else if (startsWithinExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd)) {
+                    println("starts within existing range, ends after existing range")
+                    if (type.isOverridable()) {
+                        addHighlighter(markupModel, existingStart, start, it, userData, type)
+                    } else {
+                        addHighlighter(markupModel, existingStart, end, it, userData, type)
+                    }
+                } else if (startsBeforeExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd)) {
+                    println("starts before existing range, ends within existing range")
+                    if (type.isOverridable()) {
+                        addHighlighter(markupModel, end, existingEnd, it, userData, type)
+                    } else {
+                        addHighlighter(markupModel, start, existingEnd, it, userData, type)
+                    }
                 }
             }
     }
@@ -229,7 +244,7 @@ class Styler(private var editor: Editor) {
         end: Int,
         existingStart: Int,
         existingEnd: Int
-    ) = existingStart < start && end < existingEnd
+    ) = existingStart <= start && end <= existingEnd
 
     private fun getUserData() = editor.getUserData(Constants.STYLES)
 
