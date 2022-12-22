@@ -154,6 +154,7 @@ class Styler(private var editor: Editor) {
                         addHighlighter(markupModel, existingStart, start, it, userData, type)
                     } else {
                         addHighlighter(markupModel, existingStart, end, it, userData, type)
+                        //todo check if needed
                     }
                 } else if (startsBeforeExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd)) {
                     println("starts before existing range, ends within existing range")
@@ -161,6 +162,7 @@ class Styler(private var editor: Editor) {
                         addHighlighter(markupModel, end, existingEnd, it, userData, type)
                     } else {
                         addHighlighter(markupModel, start, existingEnd, it, userData, type)
+                        //todo check if needed
                     }
                 }
             }
@@ -209,7 +211,7 @@ class Styler(private var editor: Editor) {
         type: HighlighterType
     ) = userData!!.stream()
         .filter { it.type == type }
-        .filter { it.highlighter.range != null }
+//        .filter { it.highlighter.range != null }
         .filter {
             isWithinExistingRange(start, end, it.highlighter.startOffset, it.highlighter.endOffset)
                     || includesEntireExistingRange(start, end, it.highlighter.startOffset, it.highlighter.endOffset)
