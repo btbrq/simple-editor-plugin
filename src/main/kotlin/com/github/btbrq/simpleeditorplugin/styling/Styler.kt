@@ -16,36 +16,44 @@ import java.awt.Font
 import java.util.stream.Collectors
 
 class Styler(private var editor: Editor) {
+    private var currentRange: TypedRangeHighlighter? = null
+
     fun color(color: Color) {
-        doHighlight(
+        selectRange()
+        currentRange = doHighlight(
             TextAttributes(color, null, null, null, 0),
             HighlighterType.COLOR
         )
     }
 
     fun background(color: Color) {
-        doHighlight(
+        selectRange()
+        currentRange = doHighlight(
             TextAttributes(null, color, null, null, 0),
             HighlighterType.HIGHLIGHT
         )
+        editor.selectionModel.removeSelection()
     }
 
     fun underline() {
-        doHighlight(
+        selectRange()
+        currentRange = doHighlight(
             TextAttributes(null, null, Color.YELLOW, EffectType.LINE_UNDERSCORE, 0),
             HighlighterType.UNDERLINE
         )
     }
 
     fun bold() {
-        doHighlight(
+        selectRange()
+        currentRange = doHighlight(
             TextAttributes(null, null, null, null, Font.BOLD),
             HighlighterType.BOLD
         )
     }
 
     fun italic() {
-        doHighlight(
+        selectRange()
+        currentRange = doHighlight(
             TextAttributes(null, null, null, null, Font.ITALIC),
             HighlighterType.ITALIC
         )
@@ -60,6 +68,7 @@ class Styler(private var editor: Editor) {
     }
 
     fun clear(type: HighlighterType) {
+        selectRange()
         val primaryCaret: Caret = editor.caretModel.primaryCaret
         val start: Int = primaryCaret.selectionStart
         val end: Int = primaryCaret.selectionEnd
@@ -71,7 +80,7 @@ class Styler(private var editor: Editor) {
         }
     }
 
-    private fun doHighlight(textAttributes: TextAttributes, type: HighlighterType) {
+    private fun doHighlight(textAttributes: TextAttributes, type: HighlighterType): TypedRangeHighlighter? {
         val primaryCaret: Caret = editor.caretModel.primaryCaret
         val start: Int = primaryCaret.selectionStart
         val end: Int = primaryCaret.selectionEnd
@@ -82,10 +91,12 @@ class Styler(private var editor: Editor) {
             splitAlreadyExistingHighlighting(userData, start, end, markupModel, type)
 
             if (type.isOverridable()) {
-                addHighlighting(markupModel, start, end, textAttributes, userData, type)
+                return addHighlighting(markupModel, start, end, textAttributes, userData, type)
+            } else {
+                return null
             }
         } else {
-            addHighlighting(markupModel, start, end, textAttributes, userData, type)
+            return addHighlighting(markupModel, start, end, textAttributes, userData, type)
         }
     }
 
@@ -96,7 +107,7 @@ class Styler(private var editor: Editor) {
         textAttributes: TextAttributes,
         userData: MutableList<TypedRangeHighlighter>?,
         type: HighlighterType
-    ) {
+    ): TypedRangeHighlighter {
         val highlighter = markupModel.addRangeHighlighter(
             start,
             end,
@@ -105,12 +116,13 @@ class Styler(private var editor: Editor) {
             HighlighterTargetArea.EXACT_RANGE
         )
 
+        val range = TypedRangeHighlighter(type, highlighter)
         if (userData == null) {
-            editor.putUserData(Constants.STYLES, mutableListOf(TypedRangeHighlighter(type, highlighter)))
+            editor.putUserData(Constants.STYLES, mutableListOf(range))
         } else {
-            val userData1 = getUserData()!!
-            userData1.add(TypedRangeHighlighter(type, highlighter))
+            getUserData()!!.add(range)
         }
+        return range
     }
 
     private fun splitAlreadyExistingHighlighting(
@@ -122,53 +134,45 @@ class Styler(private var editor: Editor) {
     ) {
         findHighlightersInRange(userData, start, end, type)
             .forEach {
-                val hStart = it.highlighter.startOffset
-                val hEnd = it.highlighter.endOffset
+                val existingStart = it.highlighter.startOffset
+                val existingEnd = it.highlighter.endOffset
 
                 it.highlighter.dispose()
                 userData!!.remove(it)
 
-                if (isWithinExistingRange(start, end, hStart, hEnd)) {
-                    val before = markupModel.addRangeHighlighter(
-                        hStart,
-                        start,
-                        Constants.HIGHLIGHTER_LAYER,
-                        (it.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
-                        HighlighterTargetArea.EXACT_RANGE
-                    )
-
-                    val after = markupModel.addRangeHighlighter(
-                        end,
-                        hEnd,
-                        Constants.HIGHLIGHTER_LAYER,
-                        it.highlighter.forcedTextAttributes!!,
-                        HighlighterTargetArea.EXACT_RANGE
-                    )
-
-                    userData.add(TypedRangeHighlighter(type, before))
-                    userData.add(TypedRangeHighlighter(type, after))
-                }  else if (startsWithinExistingRange(start, end, hStart, hEnd)) {
-                    val before = markupModel.addRangeHighlighter(
-                        hStart,
-                        start,
-                        Constants.HIGHLIGHTER_LAYER,
-                        (it.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
-                        HighlighterTargetArea.EXACT_RANGE
-                    )
-                    userData.add(TypedRangeHighlighter(type, before))
-                } else if (startsBeforeExistingRange(start, end, hStart, hEnd)) {
-                    val after = markupModel.addRangeHighlighter(
-                        end,
-                        hEnd,
-                        Constants.HIGHLIGHTER_LAYER,
-                        (it.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
-                        HighlighterTargetArea.EXACT_RANGE
-                    )
-                    userData.add(TypedRangeHighlighter(type, after))
+                if (isWithinExistingRange(start, end, existingStart -1, existingEnd +1) && !isExactRange(start, existingStart, end, existingEnd)) {
+                    addHighlighter(markupModel, existingStart, start, it, userData, type)
+                    addHighlighter(markupModel, end, existingEnd, it, userData, type)
+                }  else if (startsWithinExistingRange(start, end, existingStart -1, existingEnd +1) && !isExactRange(start, existingStart, end, existingEnd)) {
+                    addHighlighter(markupModel, existingStart, start, it, userData, type)
+                } else if (startsBeforeExistingRange(start, end, existingStart -1, existingEnd +1) && !isExactRange(start, existingStart, end, existingEnd)) {
+                    addHighlighter(markupModel, end, existingEnd, it, userData, type)
                 }
             }
     }
 
+    private fun addHighlighter(
+        markupModel: MarkupModel,
+        start: Int,
+        end: Int,
+        existingHighlighter: TypedRangeHighlighter,
+        userData: MutableList<TypedRangeHighlighter>,
+        type: HighlighterType
+    ) {
+        if (start < end) {
+            val highlighter = markupModel.addRangeHighlighter(
+                start,
+                end,
+                Constants.HIGHLIGHTER_LAYER,
+                (existingHighlighter.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
+                HighlighterTargetArea.EXACT_RANGE
+            )
+            userData.add(TypedRangeHighlighter(type, highlighter))
+        }
+    }
+
+    private fun isExactRange(start: Int, hStart: Int, end: Int, hEnd: Int) =
+        start == hStart && end == hEnd
 
     private fun alreadyIsHighlightedHereWithSameAttribute(
         userData: MutableList<TypedRangeHighlighter>?,
@@ -204,14 +208,14 @@ class Styler(private var editor: Editor) {
         end: Int,
         existingStart: Int,
         existingEnd: Int
-    ) = (start <= existingStart && end <= existingEnd && end >= existingStart)
+    ) = (start <= existingStart && end <= existingEnd && end > existingStart)
 
     private fun startsWithinExistingRange(
         start: Int,
         end: Int,
         existingStart: Int,
         existingEnd: Int
-    ) = (start >= existingStart && end >= existingEnd && start <= existingEnd)
+    ) = (start >= existingStart && end >= existingEnd && start < existingEnd)
 
     private fun includesEntireExistingRange(
         start: Int,
@@ -225,7 +229,16 @@ class Styler(private var editor: Editor) {
         end: Int,
         existingStart: Int,
         existingEnd: Int
-    ) = start >= existingStart && end <= existingEnd
+    ) = existingStart < start && end < existingEnd
 
     private fun getUserData() = editor.getUserData(Constants.STYLES)
+
+    private fun selectRange() {
+        if (!editor.selectionModel.hasSelection() && currentRange != null) {
+            editor.selectionModel.setSelection(
+                currentRange!!.highlighter.startOffset,
+                currentRange!!.highlighter.endOffset
+            )
+        }
+    }
 }

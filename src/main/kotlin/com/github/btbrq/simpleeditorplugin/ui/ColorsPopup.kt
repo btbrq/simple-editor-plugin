@@ -2,7 +2,6 @@ package com.github.btbrq.simpleeditorplugin.ui
 
 import com.github.btbrq.simpleeditorplugin.domain.HighlighterType
 import com.github.btbrq.simpleeditorplugin.styling.Styler
-import com.intellij.openapi.editor.Editor
 import com.intellij.ui.DarculaColors
 import com.intellij.util.Consumer
 import java.awt.Color
@@ -10,10 +9,9 @@ import java.awt.Color.*
 import java.awt.GridLayout
 import javax.swing.JPanel
 
-class ColorsPopup(editor: Editor, highlighterType: HighlighterType) : JPanel() {
+class ColorsPopup(styler: Styler, highlighterType: HighlighterType) : JPanel() {
     init {
         layout = GridLayout(0, 6)
-        val styler = Styler(editor)
         val function = actionFunction(highlighterType, styler)
         val clearAction = Consumer { type: HighlighterType -> styler.clear(type) }
 

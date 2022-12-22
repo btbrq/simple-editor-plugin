@@ -18,11 +18,11 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
         val styler = Styler(editor)
 
         val colorButton = PopupIconButton(AllIcons.FileTypes.Text, "Text color")
-        colorButton.addActionListener(popupAction(editor, HighlighterType.COLOR, colorButton))
+        colorButton.addActionListener(popupAction(styler, HighlighterType.COLOR, colorButton))
         add(colorButton)
 
         val backgroundButton = PopupIconButton(AllIcons.Actions.Highlighting, "Highlight")
-        backgroundButton.addActionListener(popupAction(editor, HighlighterType.HIGHLIGHT, colorButton))
+        backgroundButton.addActionListener(popupAction(styler, HighlighterType.HIGHLIGHT, colorButton))
         add(backgroundButton)
 
         val underlineButton = PopupTextButton(
@@ -44,11 +44,11 @@ class SimpleEditorPopup(editor: Editor) : JPanel() {
     }
 
     private fun popupAction(
-        editor: Editor,
+        styler: Styler,
         highlighterType: HighlighterType,
         button: JButton
     ): (e: ActionEvent) -> Unit = {
-        JBPopupFactory.getInstance().createComponentPopupBuilder(ColorsPopup(editor, highlighterType), null)
+        JBPopupFactory.getInstance().createComponentPopupBuilder(ColorsPopup(styler, highlighterType), null)
             .createPopup()
             .showUnderneathOf(button)
     }
