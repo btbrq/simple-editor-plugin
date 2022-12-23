@@ -35,13 +35,21 @@ class StylerBaseSpec extends Specification {
         }
     }
 
-    def performAction(def type) {
+    def performBasicAction(def type) {
         if (type == BOLD) {
             styler.bold()
         } else if (type == UNDERLINE) {
             styler.underline()
         } else if (type == ITALIC) {
             styler.italic()
+        }
+    }
+
+    def performColoredAction(def type, Color color) {
+        if (type == COLOR) {
+            styler.color(color)
+        } else if (type == HIGHLIGHT) {
+            styler.background(color)
         }
     }
 
@@ -73,6 +81,14 @@ class StylerBaseSpec extends Specification {
 
     def italicAttributes() {
         new TextAttributes(null, null, null, null, Font.ITALIC)
+    }
+
+    def colorAttributes(Color color) {
+        new TextAttributes(color, null, null, null, 0)
+    }
+
+    def backgroundAttributes(Color color) {
+        new TextAttributes(null, color, null, null, 0)
     }
 
     def userData() {

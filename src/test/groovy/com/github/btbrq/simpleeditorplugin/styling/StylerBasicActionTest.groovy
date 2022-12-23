@@ -27,7 +27,7 @@ class StylerBasicActionTest extends StylerBaseSpec {
         caret(7, 10)
 
         when:
-        performAction(type)
+        performBasicAction(type)
 
         then:
         1 * editor.getMarkupModel().addRangeHighlighter(7, 10, _, _, _) >> rangeHighlighter(7, 10, attributes)
@@ -45,18 +45,19 @@ class StylerBasicActionTest extends StylerBaseSpec {
         //-1111111|111--
         //-1111111|-11--
         given:
-        addHighlighter(type, 1, 7, attributes)
-        def highlighter = addHighlighter(type, 7, 10, attributes)
+        def highlighter1 = addHighlighter(type, 1, 7, attributes)
+        def highlighter2 = addHighlighter(type, 7, 10, attributes)
 
         and:
         caret(7, 8)
 
         when:
-        performAction(type)
+        performBasicAction(type)
 
         then:
         userData().size() == 2
-        1 * highlighter.highlighter.dispose()
+        0 * highlighter1.highlighter.dispose()
+        1 * highlighter2.highlighter.dispose()
         0 * editor.getMarkupModel().addRangeHighlighter(7, 8, _, _, _)
         1 * editor.getMarkupModel().addRangeHighlighter(8, 10, _, _, _) >> rangeHighlighter(8, 10, attributes)
 
@@ -79,7 +80,7 @@ class StylerBasicActionTest extends StylerBaseSpec {
         caret(3, 8)
 
         when:
-        performAction(type)
+        performBasicAction(type)
 
         then:
         userData().size() == 1
@@ -105,7 +106,7 @@ class StylerBasicActionTest extends StylerBaseSpec {
         caret(5, 8)
 
         when:
-        performAction(type)
+        performBasicAction(type)
 
         then:
         userData().size() == 1
@@ -131,7 +132,7 @@ class StylerBasicActionTest extends StylerBaseSpec {
         caret(3, 7)
 
         when:
-        performAction(type)
+        performBasicAction(type)
 
         then:
         userData().size() == 0
@@ -157,7 +158,7 @@ class StylerBasicActionTest extends StylerBaseSpec {
         caret(2, 8)
 
         when:
-        performAction(type)
+        performBasicAction(type)
 
         then:
         userData().size() == 1
@@ -171,5 +172,21 @@ class StylerBasicActionTest extends StylerBaseSpec {
         ITALIC    | italicAttributes()
     }
 
-    //todo create tests for not interfering types: e.g. underline + bold
+    def "should add highlighting affecting range of two already existing, but the types are not interfering"() {
+        given:
+        def highlighter1 = addHighlighter(UNDERLINE, 1, 7, boldAttributes())
+        def highlighter2 = addHighlighter(ITALIC, 5, 10, italicAttributes())
+
+        and:
+        caret(7, 15)
+
+        when:
+        performBasicAction(BOLD)
+
+        then:
+        userData().size() == 3
+        0 * highlighter1.highlighter.dispose()
+        0 * highlighter2.highlighter.dispose()
+        1 * editor.getMarkupModel().addRangeHighlighter(7, 15, _, _, _) >> rangeHighlighter(7, 15, boldAttributes())
+    }
 }
