@@ -1,33 +1,10 @@
 package com.github.btbrq.simpleeditorplugin.styling
 
-import com.github.btbrq.simpleeditorplugin.constants.Constants
-import com.github.btbrq.simpleeditorplugin.domain.TypedRangeHighlighter
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.CaretModel
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.SelectionModel
-import com.intellij.openapi.editor.ex.RangeHighlighterEx
-import com.intellij.openapi.editor.markup.EffectType
-import com.intellij.openapi.editor.markup.MarkupModel
-import com.intellij.openapi.editor.markup.TextAttributes
-import spock.lang.Specification
-import spock.lang.Subject
 import spock.lang.Unroll
 
-import java.awt.*
+import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.*
 
-import static com.github.btbrq.simpleeditorplugin.constants.Constants.STYLES
-import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.BOLD
-import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.ITALIC
-import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.UNDERLINE
-
-class StylerTest extends Specification {
-    def editor = Mock(Editor) {
-        getUserData(STYLES) >> []
-    }
-    @Subject
-    def styler = new Styler(editor)
-
+class StylerBasicActionTest extends StylerBaseSpec {
     def "should clear all"() {
         given:
         caret(7, 10)
@@ -64,7 +41,7 @@ class StylerTest extends Specification {
     }
 
     @Unroll
-    def "should clear highlighting in the middle of two highlighters: #type"() {
+    def "should clear highlighting in the middle of two highlighters, affecting one: #type"() {
         //-1111111|111--
         //-1111111|-11--
         given:
@@ -195,60 +172,4 @@ class StylerTest extends Specification {
     }
 
     //todo create tests for not interfering types: e.g. underline + bold
-
-    def caret(def start, def end) {
-        editor.getMarkupModel() >> Mock(MarkupModel)
-        editor.getSelectionModel() >> Mock(SelectionModel)
-        editor.getCaretModel() >> Mock(CaretModel) {
-            getPrimaryCaret() >> Mock(Caret) {
-                getSelectionStart() >> start
-                getSelectionEnd() >> end
-            }
-        }
-    }
-
-    def performAction(def type) {
-        if (type == BOLD) {
-            styler.bold()
-        } else if (type == UNDERLINE) {
-            styler.underline()
-        } else if (type == ITALIC) {
-            styler.italic()
-        }
-    }
-
-    def addHighlighter(def type, def start, def end, def attributes = boldAttributes()) {
-        def highlighter = highlighter(type, start, end, attributes)
-        userData().add(highlighter)
-        highlighter
-    }
-
-    def highlighter(def type, def start, def end, def attributes) {
-        new TypedRangeHighlighter(type, rangeHighlighter(start, end, attributes))
-    }
-
-    def rangeHighlighter(def start, def end, def attributes) {
-        Mock(RangeHighlighterEx) {
-            getStartOffset() >> start
-            getEndOffset() >> end
-            getForcedTextAttributes() >> attributes
-        }
-    }
-
-    def boldAttributes() {
-        new TextAttributes(null, null, null, null, Font.BOLD)
-    }
-
-    def underlineAttributes() {
-        new TextAttributes(null, null, Color.YELLOW, EffectType.LINE_UNDERSCORE, 0)
-    }
-
-    def italicAttributes() {
-        new TextAttributes(null, null, null, null, Font.ITALIC)
-    }
-
-    def userData() {
-        editor.getUserData(Constants.STYLES)
-    }
-
 }
