@@ -5,6 +5,8 @@
 
     <depends>com.intellij.modules.platform</depends>
 
+    <idea-version since-build="203"/>
+
     <actions>
         <action
                 id="com.github.btbrq.simpleeditorplugin.SimpleEditor"

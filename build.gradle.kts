@@ -9,8 +9,8 @@ plugins {
     id("org.jetbrains.intellij") version "1.10.1"
 }
 
-group = properties("pluginGroup")
-version = properties("pluginVersion")
+group = "com.github.btbrq.simpleeditorplugin"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -24,20 +24,17 @@ intellij {
     pluginName.set(properties("pluginName"))
     version.set(properties("platformVersion"))
     type.set(properties("platformType"))
+    updateSinceUntilBuild.set(false)
 
     plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
 }
 
-tasks {
-    wrapper {
-        gradleVersion = properties("gradleVersion")
-    }
-}
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.codehaus.groovy:groovy-all:2.5.14")
     testImplementation("org.spockframework:spock-core:1.2-groovy-2.5")
 }
+
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
     jvmTarget = "1.8"
@@ -45,4 +42,24 @@ compileKotlin.kotlinOptions {
 val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
+}
+
+tasks {
+    patchPluginXml {
+        if (System.getenv("CHANGE_NOTES_PATH") != null) {
+            changeNotes.set(file(System.getenv("CHANGE_NOTES_PATH")).readText())
+        }
+    }
+
+    signPlugin {
+        if (System.getenv("CERTIFICATE_CHAIN_PATH") != null && System.getenv("PRIVATE_KEY_PATH") != null) {
+            certificateChain.set(file(System.getenv("CERTIFICATE_CHAIN_PATH")).readText())
+            privateKey.set(file(System.getenv("PRIVATE_KEY_PATH")).readText())
+            password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+        }
+    }
+
+    publishPlugin {
+        token.set(System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken"))
+    }
 }
