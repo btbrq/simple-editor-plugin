@@ -75,7 +75,7 @@ class Styler(private var editor: Editor) {
 
         val userData = getUserData()
         if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type)) {
-            splitAlreadyExistingHighlighting(userData, start, end, markupModel, type)
+            splitAlreadyExistingHighlighters(userData, start, end, markupModel, type)
         }
     }
 
@@ -87,19 +87,19 @@ class Styler(private var editor: Editor) {
 
         val userData = getUserData()
         return if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type)) {
-            splitAlreadyExistingHighlighting(userData, start, end, markupModel, type)
+            splitAlreadyExistingHighlighters(userData, start, end, markupModel, type)
 
             if (type.isOverridable()) {
-                addHighlighting(markupModel, start, end, textAttributes, userData, type)
+                addAttributedHighlighter(markupModel, start, end, textAttributes, userData, type)
             } else {
                 null
             }
         } else {
-            addHighlighting(markupModel, start, end, textAttributes, userData, type)
+            addAttributedHighlighter(markupModel, start, end, textAttributes, userData, type)
         }
     }
 
-    private fun addHighlighting(
+    private fun addAttributedHighlighter(
         markupModel: MarkupModel,
         start: Int,
         end: Int,
@@ -124,7 +124,7 @@ class Styler(private var editor: Editor) {
         return range
     }
 
-    private fun splitAlreadyExistingHighlighting(
+    private fun splitAlreadyExistingHighlighters(
         userData: MutableList<TypedRangeHighlighter>?,
         start: Int,
         end: Int,
@@ -140,27 +140,27 @@ class Styler(private var editor: Editor) {
                 userData!!.remove(it)
 
                 if (isWithinExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd)) {
-                    addHighlighter(markupModel, existingStart, start, it, userData, type)
-                    addHighlighter(markupModel, end, existingEnd, it, userData, type)
+                    addHighlighterBasedOnExisting(markupModel, existingStart, start, it, userData, type)
+                    addHighlighterBasedOnExisting(markupModel, end, existingEnd, it, userData, type)
                 } else if (includesEntireExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd) && !type.isOverridable()) {
-                    addHighlighter(markupModel, start, end, it, userData, type)
+                    addHighlighterBasedOnExisting(markupModel, start, end, it, userData, type)
                 }  else if (startsWithinExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd)) {
                     if (type.isOverridable()) {
-                        addHighlighter(markupModel, existingStart, start, it, userData, type)
+                        addHighlighterBasedOnExisting(markupModel, existingStart, start, it, userData, type)
                     } else {
-                        addHighlighter(markupModel, existingStart, end, it, userData, type)
+                        addHighlighterBasedOnExisting(markupModel, existingStart, end, it, userData, type)
                     }
                 } else if (startsBeforeExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd)) {
                     if (type.isOverridable()) {
-                        addHighlighter(markupModel, end, existingEnd, it, userData, type)
+                        addHighlighterBasedOnExisting(markupModel, end, existingEnd, it, userData, type)
                     } else {
-                        addHighlighter(markupModel, start, existingEnd, it, userData, type)
+                        addHighlighterBasedOnExisting(markupModel, start, existingEnd, it, userData, type)
                     }
                 }
             }
     }
 
-    private fun addHighlighter(
+    private fun addHighlighterBasedOnExisting(
         markupModel: MarkupModel,
         start: Int,
         end: Int,

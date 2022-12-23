@@ -2,7 +2,9 @@ package com.github.btbrq.simpleeditorplugin.styling
 
 import spock.lang.Unroll
 
-import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.*
+import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.BOLD
+import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.ITALIC
+import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.UNDERLINE
 
 class StylerBasicActionTest extends StylerBaseSpec {
     def "should clear all"() {

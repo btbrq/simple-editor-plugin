@@ -1,12 +1,16 @@
 package com.github.btbrq.simpleeditorplugin.styling
 
-
+import com.intellij.openapi.editor.markup.TextAttributes
 import spock.lang.Unroll
 
 import java.awt.*
 
+import static com.github.btbrq.simpleeditorplugin.constants.Constants.HIGHLIGHTER_LAYER
+import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.BOLD
 import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.COLOR
 import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.HIGHLIGHT
+import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.UNDERLINE
+import static com.intellij.openapi.editor.markup.HighlighterTargetArea.EXACT_RANGE
 
 class StylerColoredActionTest extends StylerBaseSpec {
     @Unroll
@@ -178,5 +182,81 @@ class StylerColoredActionTest extends StylerBaseSpec {
         0 * highlighter1.highlighter.dispose()
         0 * highlighter2.highlighter.dispose()
         1 * editor.getMarkupModel().addRangeHighlighter(7, 15, _, attributes, _) >> rangeHighlighter(7, 15, boldAttributes())
+    }
+
+    def "should repeat background highlight operation"() {
+        given:
+        TextAttributes greenAttributes = backgroundAttributes(Color.GREEN)
+        def redAttributes = backgroundAttributes(Color.RED)
+        caret(7, 10)
+
+        and:
+        editor.getMarkupModel().addRangeHighlighter(7, 10, HIGHLIGHTER_LAYER, greenAttributes, EXACT_RANGE) >> rangeHighlighter(7, 10, greenAttributes)
+        performColoredAction(HIGHLIGHT, Color.GREEN)
+        assert userData().size() == 1
+
+        when:
+        performColoredAction(HIGHLIGHT, Color.RED)
+
+        then:
+        1 * editor.getMarkupModel().addRangeHighlighter(7, 10, _, redAttributes, _) >> rangeHighlighter(7, 10, redAttributes)
+        userData().size() == 1
+    }
+
+    def "should do color operation after background highlighting"() {
+        given:
+        TextAttributes greenAttributes = backgroundAttributes(Color.GREEN)
+        def redAttributes = colorAttributes(Color.RED)
+        caret(7, 10)
+
+        and:
+        editor.getMarkupModel().addRangeHighlighter(7, 10, HIGHLIGHTER_LAYER, greenAttributes, EXACT_RANGE) >> rangeHighlighter(7, 10, greenAttributes)
+        performColoredAction(HIGHLIGHT, Color.GREEN)
+        assert userData().size() == 1
+
+        when:
+        performColoredAction(COLOR, Color.RED)
+
+        then:
+        1 * editor.getMarkupModel().addRangeHighlighter(7, 10, _, redAttributes, _) >> rangeHighlighter(7, 10, redAttributes)
+        userData().size() == 2
+    }
+
+    def "should do basic operation and other types of operations after background highlighting and then clear"() {
+        given:
+        TextAttributes backgroundAttributes = backgroundAttributes(Color.GREEN)
+        caret(7, 10)
+
+        and:
+        editor.getMarkupModel().addRangeHighlighter(7, 10, HIGHLIGHTER_LAYER, backgroundAttributes, EXACT_RANGE) >> rangeHighlighter(7, 10, backgroundAttributes)
+        performColoredAction(HIGHLIGHT, Color.GREEN)
+        assert userData().size() == 1
+
+        when: "bold action"
+        performBasicAction(BOLD)
+
+        then: "bold styling should be added"
+        1 * editor.getMarkupModel().addRangeHighlighter(7, 10, _, boldAttributes(), _) >> rangeHighlighter(7, 10, boldAttributes())
+        userData().size() == 2
+
+        when: "underline action"
+        performBasicAction(UNDERLINE)
+
+        then: "underline styling should be added"
+        1 * editor.getMarkupModel().addRangeHighlighter(7, 10, _, underlineAttributes(), _) >> rangeHighlighter(7, 10, underlineAttributes())
+        userData().size() == 3
+
+        when: "color action"
+        performColoredAction(COLOR, Color.RED)
+
+        then: "color should be added"
+        1 * editor.getMarkupModel().addRangeHighlighter(7, 10, _, colorAttributes(Color.RED), _) >> rangeHighlighter(7, 10, colorAttributes(Color.RED))
+        userData().size() == 4
+
+        when: "clear highlighting"
+        styler.clear(HIGHLIGHT)
+
+        then: "highlighting should be cleared"
+        userData().size() == 3
     }
 }

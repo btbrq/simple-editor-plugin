@@ -15,7 +15,11 @@ import spock.lang.Subject
 import java.awt.*
 
 import static com.github.btbrq.simpleeditorplugin.constants.Constants.STYLES
-import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.*
+import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.BOLD
+import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.COLOR
+import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.HIGHLIGHT
+import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.ITALIC
+import static com.github.btbrq.simpleeditorplugin.domain.HighlighterType.UNDERLINE
 
 class StylerBaseSpec extends Specification {
     def editor = Mock(Editor) {
