@@ -10,7 +10,6 @@ import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.MarkupModel
 import com.intellij.openapi.editor.markup.TextAttributes
-import com.intellij.refactoring.suggested.range
 import java.awt.Color
 import java.awt.Font
 import java.util.stream.Collectors
@@ -76,7 +75,7 @@ class Styler(private var editor: Editor) {
 
         val userData = getUserData()
         if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type)) {
-            splitAlreadyExistingHighlighting(userData, start, end, markupModel, type)
+            splitAlreadyExistingHighlighters(userData, start, end, markupModel, type)
         }
     }
 
@@ -87,20 +86,20 @@ class Styler(private var editor: Editor) {
         val markupModel = editor.markupModel
 
         val userData = getUserData()
-        if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type)) {
-            splitAlreadyExistingHighlighting(userData, start, end, markupModel, type)
+        return if (alreadyIsHighlightedHereWithSameAttribute(userData, start, end, type)) {
+            splitAlreadyExistingHighlighters(userData, start, end, markupModel, type)
 
             if (type.isOverridable()) {
-                return addHighlighting(markupModel, start, end, textAttributes, userData, type)
+                addAttributedHighlighter(markupModel, start, end, textAttributes, userData, type)
             } else {
-                return null
+                null
             }
         } else {
-            return addHighlighting(markupModel, start, end, textAttributes, userData, type)
+            addAttributedHighlighter(markupModel, start, end, textAttributes, userData, type)
         }
     }
 
-    private fun addHighlighting(
+    private fun addAttributedHighlighter(
         markupModel: MarkupModel,
         start: Int,
         end: Int,
@@ -125,7 +124,7 @@ class Styler(private var editor: Editor) {
         return range
     }
 
-    private fun splitAlreadyExistingHighlighting(
+    private fun splitAlreadyExistingHighlighters(
         userData: MutableList<TypedRangeHighlighter>?,
         start: Int,
         end: Int,
@@ -140,18 +139,28 @@ class Styler(private var editor: Editor) {
                 it.highlighter.dispose()
                 userData!!.remove(it)
 
-                if (isWithinExistingRange(start, end, existingStart -1, existingEnd +1) && !isExactRange(start, existingStart, end, existingEnd)) {
-                    addHighlighter(markupModel, existingStart, start, it, userData, type)
-                    addHighlighter(markupModel, end, existingEnd, it, userData, type)
-                }  else if (startsWithinExistingRange(start, end, existingStart -1, existingEnd +1) && !isExactRange(start, existingStart, end, existingEnd)) {
-                    addHighlighter(markupModel, existingStart, start, it, userData, type)
-                } else if (startsBeforeExistingRange(start, end, existingStart -1, existingEnd +1) && !isExactRange(start, existingStart, end, existingEnd)) {
-                    addHighlighter(markupModel, end, existingEnd, it, userData, type)
+                if (isWithinExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd)) {
+                    addHighlighterBasedOnExisting(markupModel, existingStart, start, it, userData, type)
+                    addHighlighterBasedOnExisting(markupModel, end, existingEnd, it, userData, type)
+                } else if (includesEntireExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd) && !type.isOverridable()) {
+                    addHighlighterBasedOnExisting(markupModel, start, end, it, userData, type)
+                }  else if (startsWithinExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd)) {
+                    if (type.isOverridable()) {
+                        addHighlighterBasedOnExisting(markupModel, existingStart, start, it, userData, type)
+                    } else {
+                        addHighlighterBasedOnExisting(markupModel, existingStart, end, it, userData, type)
+                    }
+                } else if (startsBeforeExistingRange(start, end, existingStart, existingEnd) && !isExactRange(start, existingStart, end, existingEnd)) {
+                    if (type.isOverridable()) {
+                        addHighlighterBasedOnExisting(markupModel, end, existingEnd, it, userData, type)
+                    } else {
+                        addHighlighterBasedOnExisting(markupModel, start, existingEnd, it, userData, type)
+                    }
                 }
             }
     }
 
-    private fun addHighlighter(
+    private fun addHighlighterBasedOnExisting(
         markupModel: MarkupModel,
         start: Int,
         end: Int,
@@ -194,7 +203,6 @@ class Styler(private var editor: Editor) {
         type: HighlighterType
     ) = userData!!.stream()
         .filter { it.type == type }
-        .filter { it.highlighter.range != null }
         .filter {
             isWithinExistingRange(start, end, it.highlighter.startOffset, it.highlighter.endOffset)
                     || includesEntireExistingRange(start, end, it.highlighter.startOffset, it.highlighter.endOffset)
@@ -229,7 +237,7 @@ class Styler(private var editor: Editor) {
         end: Int,
         existingStart: Int,
         existingEnd: Int
-    ) = existingStart < start && end < existingEnd
+    ) = existingStart <= start && end <= existingEnd
 
     private fun getUserData() = editor.getUserData(Constants.STYLES)
 

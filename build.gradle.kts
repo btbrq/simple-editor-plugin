@@ -4,6 +4,7 @@ fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
+    id("groovy")
     id("org.jetbrains.kotlin.jvm") version "1.7.21"
     id("org.jetbrains.intellij") version "1.10.1"
 }
@@ -34,6 +35,8 @@ tasks {
 }
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("org.codehaus.groovy:groovy-all:2.5.14")
+    testImplementation("org.spockframework:spock-core:1.2-groovy-2.5")
 }
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
