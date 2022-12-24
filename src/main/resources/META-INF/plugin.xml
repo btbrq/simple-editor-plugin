@@ -1,7 +1,17 @@
 <idea-plugin>
     <id>com.github.btbrq.simpleeditorplugin</id>
     <name>Simple Editor</name>
-    <vendor>Bartosz Turek</vendor>
+    <vendor url="https://github.com/btbrq">Bartosz Turek</vendor>
+
+    <description><![CDATA[
+    Lets you highlight, color, apply other style to selected text.
+    Displays a popup window with available styles that you can use to style selected text.
+    <br><br>
+    <img src="https://raw.githubusercontent.com/btbrq/CommitChecklist-Plugin/master/screenshots/commit-dialog-sm.png"
+        width="220"
+        height="150"
+    />
+    ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
 
@@ -12,8 +22,8 @@
                 id="com.github.btbrq.simpleeditorplugin.SimpleEditor"
                 class="com.github.btbrq.simpleeditorplugin.action.PopupWindowAction"
                 text="Simple Editor"
-                description="Styles the selected text.">
-<!--                icon="SdkIcons.Sdk_default_icon">-->
+                description="Styles the selected text."
+                icon="AllIcons.Actions.Edit">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift E"/>-->
         </action>
