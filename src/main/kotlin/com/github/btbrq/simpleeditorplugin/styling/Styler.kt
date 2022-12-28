@@ -5,7 +5,6 @@ import com.github.btbrq.simpleeditorplugin.domain.HighlighterType
 import com.github.btbrq.simpleeditorplugin.domain.TypedRangeHighlighter
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.ex.RangeHighlighterEx
 import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.MarkupModel
@@ -115,7 +114,7 @@ class Styler(private var editor: Editor) {
             HighlighterTargetArea.EXACT_RANGE
         )
 
-        val range = TypedRangeHighlighter(type, highlighter)
+        val range = TypedRangeHighlighter(type, highlighter, textAttributes)
         if (userData == null) {
             editor.putUserData(Constants.STYLES, mutableListOf(range))
         } else {
@@ -173,10 +172,10 @@ class Styler(private var editor: Editor) {
                 start,
                 end,
                 Constants.HIGHLIGHTER_LAYER,
-                (existingHighlighter.highlighter as RangeHighlighterEx).forcedTextAttributes!!,
+                existingHighlighter.attributes,
                 HighlighterTargetArea.EXACT_RANGE
             )
-            userData.add(TypedRangeHighlighter(type, highlighter))
+            userData.add(TypedRangeHighlighter(type, highlighter, existingHighlighter.attributes))
         }
     }
 

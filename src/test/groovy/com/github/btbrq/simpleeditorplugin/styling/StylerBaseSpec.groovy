@@ -64,7 +64,7 @@ class StylerBaseSpec extends Specification {
     }
 
     def highlighter(def type, def start, def end, def attributes) {
-        new TypedRangeHighlighter(type, rangeHighlighter(start, end, attributes))
+        new TypedRangeHighlighter(type, rangeHighlighter(start, end, attributes), attributes)
     }
 
     def rangeHighlighter(def start, def end, def attributes) {
