@@ -6,16 +6,22 @@
     <description><![CDATA[
     Lets you highlight, color, apply other style to selected text.
     Displays a popup window with available styles that you can use to style selected text.
+    <br>
+    Can be run with context menu actions or shortcut
+    <br>
+    - Alt + Shift + E - Windows<br>
+    - Option + Shift + E - MacOS
     <br><br>
-    <img src="https://raw.githubusercontent.com/btbrq/tcov/main/colored-example.png"
-        width="276"
-        height="263"
+    <img src="https://github.com/btbrq/simple-editor-plugin/blob/main/screenshots/colored-example.png?raw=true"
+        width="303"
+        height="290"
     />
+
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
 
-    <idea-version since-build="203"/>
+    <idea-version since-build="213"/>
 
     <actions>
         <action
@@ -25,10 +31,8 @@
                 description="Styles the selected text."
                 icon="AllIcons.Actions.Edit">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="EditorToggleColumnMode"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift E"/>-->
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift E"/>
         </action>
-
-
     </actions>
 
 </idea-plugin>

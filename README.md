@@ -10,3 +10,8 @@ Displays a popup window with available styles that you can use to style selected
     <td><img src="screenshots/colored-example.png"/></td>
   </tr>
  </table>
+
+Can be run with context menu actions or shortcut
+
+* **Alt + Shift + E** - Windows
+* **Option + Shift + E** - MacOS
