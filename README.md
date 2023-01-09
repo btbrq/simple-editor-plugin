@@ -15,3 +15,6 @@ Can be run with context menu actions or shortcut
 
 * **Alt + Shift + E** - Windows
 * **Option + Shift + E** - MacOS
+
+### Installation
+[https://plugins.jetbrains.com/plugin/20759-simple-editor](https://plugins.jetbrains.com/plugin/20759-simple-editor)
