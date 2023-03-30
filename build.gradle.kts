@@ -5,8 +5,8 @@ fun properties(key: String) = project.findProperty(key).toString()
 plugins {
     id("java")
     id("groovy")
-    id("org.jetbrains.kotlin.jvm") version "1.7.21"
-    id("org.jetbrains.intellij") version "1.10.1"
+    id("org.jetbrains.kotlin.jvm") version "1.8.10"
+    id("org.jetbrains.intellij") version "1.13.2"
 }
 
 group = "com.github.btbrq.simpleeditorplugin"

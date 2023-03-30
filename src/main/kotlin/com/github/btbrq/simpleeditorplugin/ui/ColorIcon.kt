@@ -2,7 +2,7 @@ package com.github.btbrq.simpleeditorplugin.ui
 
 import com.github.btbrq.simpleeditorplugin.constants.Constants.Companion.COLOR_SIZE
 import com.github.btbrq.simpleeditorplugin.styling.ColorHighlightListener
-import com.intellij.util.Consumer
+import java.util.function.Consumer
 import java.awt.Color
 import javax.swing.JPanel
 
